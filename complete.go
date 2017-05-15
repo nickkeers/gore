@@ -56,10 +56,6 @@ func (s *Session) completeWord(line string, pos int) (string, []string, string) 
 	return line[0:pos], cands, ""
 }
 
-func (s *Session) showCandidates(module string, candidates []string) {
-
-}
-
 // completeCode does code completion within the session using gocode (https://github.com/nsf/gocode).
 // in and pos specifies the current input and the cursor position (0 <= pos <= len(in)) respectively.
 // If exprMode is set to true, the completion is done as an expression (e.g. appends "(" to functions).
