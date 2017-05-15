@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/motemen/gore/gocode"
@@ -55,6 +56,10 @@ func (s *Session) completeWord(line string, pos int) (string, []string, string) 
 	return line[0:pos], cands, ""
 }
 
+func (s *Session) showCandidates(module string, candidates []string) {
+
+}
+
 // completeCode does code completion within the session using gocode (https://github.com/nsf/gocode).
 // in and pos specifies the current input and the cursor position (0 <= pos <= len(in)) respectively.
 // If exprMode is set to true, the completion is done as an expression (e.g. appends "(" to functions).
@@ -79,13 +84,42 @@ func (s *Session) completeCode(in string, pos int, exprMode bool) (keep int, can
 
 	keep = pos - result.Cursor
 	candidates = make([]string, 0, len(result.Candidates))
+
+	helpBuf := ""
+	funcBuf := "\n"
+	typeBuf := "\n"
+	constBuf := "\n"
+	varBuf := "\n"
+
 	for _, e := range result.Candidates {
 		cand := e.Name
+		// type, var, const
 		if exprMode && e.Class == "func" {
+			funcBuf += formatBuf("func", cand)
 			cand = cand + "("
+		} else if exprMode && e.Class == "type" {
+			typeBuf += formatBuf("type", cand)
+		} else if e.Class == "const" {
+			constBuf += formatBuf("const", cand)
+		} else if e.Class == "var" {
+			varBuf += formatBuf("var", cand)
 		}
+
 		candidates = append(candidates, cand)
 	}
 
+	helpBuf = constBuf + typeBuf + varBuf + funcBuf
+	fmt.Println(helpBuf)
+
+	helpBuf = ""
+	funcBuf = ""
+	typeBuf = ""
+	constBuf = ""
+	varBuf = ""
+
 	return
+}
+
+func formatBuf(typef string, val string) string {
+	return fmt.Sprintf("%s\t%s\n", typef, val)
 }
